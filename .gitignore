@@ -1,0 +1,4 @@
+bin/test.exe
+bin/test.pdb
+build/*
+lib/*
