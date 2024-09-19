@@ -8,6 +8,7 @@
 #include <fstream>
 #include <map>
 #include <unordered_set>
+#include <assert.h>
 
 namespace fs = std::filesystem;
 
@@ -60,6 +61,12 @@ private:
     std::unordered_set<str> exists_name = {};
     std::unordered_set<str> exists_key = {};
 
+    std::map<QuickConfigDataType, str> type_2_str_map = {
+        {QuickConfigDataType::QC_DT_NUMBER ,"Number"},
+        {QuickConfigDataType::QC_DT_STRING ,"String"},
+        {QuickConfigDataType::QC_DT_BOOLEAN,"Boolean"},
+    };
+
     static QuickConfigServer* instance;
     config_map _c_map = config_map();
     QuickConfigServer();
@@ -74,9 +81,19 @@ private:
     bool is_bool(const std::string &s);
     double to_number(const std::string &s);
     bool to_bool(const std::string &s);
+    static bool _b_val;
+    static str _s_val;
+    static double _n_val;
+
 public:
     static QuickConfigServer* get_instance();
     void add_config_path(QC_Path _path);
+
+
+    void get(const str& name, const str& key, double* ret_ptr);
+    void get(const str& name, const str& key, str*& ret_ptr);
+    void get(const str& name, const str& key, bool* ret_ptr);
+
     ~QuickConfigServer();
 };
 

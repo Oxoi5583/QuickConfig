@@ -217,23 +217,29 @@ void QuickConfigServer::check_configfile_duplicated(str _line,bool* value){
 }
 
 void QuickConfigServer::raise_checking_error(str msg){
+    //#ifndef DEBUG
     std::cerr 
     << "[ERROR] Exception : " 
     << msg
-    << "\n    (" 
-    << checking_file
-    << "@@<line:"
-    << checking_line
-    << ">@@["
-    << checking_line_str 
-    << "])"
-    << std::endl
-    << "    Header format   : [QuickConfig::<namespace>]"
-    << std::endl
-    << "    Body format     : <type>@<key>::<value>"
-    << std::endl
-    ;
+    << std::endl;
+    if(checking_file == ""){
+        std::cerr 
+        << "    (" 
+        << checking_file
+        << "@@<line:"
+        << checking_line
+        << ">@@["
+        << checking_line_str 
+        << "])"
+        << std::endl
+        << "    Header format   : [QuickConfig::<namespace>]"
+        << std::endl
+        << "    Body format     : <type>@<key>::<value>"
+        << std::endl
+        ;
+    }
     exit(1);
+    //#endif
 }
 
 void QuickConfigServer::add_config_path(QC_Path _path){
@@ -320,6 +326,7 @@ void QuickConfigServer::add_config(){
         bool* _val_b = (bool*)malloc(sizeof(bool));
         double* _val_n = (double*)malloc(sizeof(double));
         str* _val_s = (str*)malloc(sizeof(str));
+
         switch (_val_t)
         {
         case QuickConfigDataType::QC_DT_BOOLEAN:{
@@ -343,6 +350,70 @@ void QuickConfigServer::add_config(){
         _c_map[checking_config_name].insert_or_assign(checking_config_key, std::make_pair(_val_t,_val_ptr));
     }
 }
+
+#define UNINITIALIZED_PTR_VALUE reinterpret_cast<void*>(0xDEADBEEF)
+
+void QuickConfigServer::get(const str& name, const str& key, double* ret_ptr){
+    assert(_c_map.contains(name));
+    assert(_c_map[name].contains(key));
+    assert(_c_map[name][key].second != nullptr);
+    if(ret_ptr != nullptr || ret_ptr == UNINITIALIZED_PTR_VALUE){
+        //std::cout << "deleted" <<std::endl;
+        delete ret_ptr;
+        ret_ptr = nullptr;
+    }
+
+
+    QuickConfigDataType _type = _c_map[name][key].first;
+    if(_type != QuickConfigDataType::QC_DT_NUMBER){
+        raise_checking_error("Type conversion failed. Should be "+type_2_str_map[_type]);
+    }
+    double _n_val = *static_cast<double*>(this->_c_map[name][key].second);
+    //std::cout << _n_val << std::endl;
+    ret_ptr = new double{_n_val};
 }
+void QuickConfigServer::get(const str& name, const str& key, str*& ret_ptr){
+    assert(_c_map.contains(name));
+    assert(_c_map[name].contains(key));
+    assert(_c_map[name][key].second != nullptr);
+    if(ret_ptr != nullptr || ret_ptr == UNINITIALIZED_PTR_VALUE){
+        //std::cout << "deleted" <<std::endl;
+        delete ret_ptr;
+        ret_ptr = nullptr;
+    }
+    
+
+    QuickConfigDataType _type = _c_map[name][key].first;
+    if(_type != QuickConfigDataType::QC_DT_STRING){
+        raise_checking_error("Type conversion failed. Should be "+type_2_str_map[_type]);
+    }
+    str _s_val = *static_cast<str*>(this->_c_map[name][key].second);
+    //std::cout << _s_val << std::endl;
+    //std::cout << ret_ptr << std::endl;
+    ret_ptr = new str{_s_val};
+}
+void QuickConfigServer::get(const str& name, const str& key, bool* ret_ptr){
+    assert(_c_map.contains(name));
+    assert(_c_map[name].contains(key));
+    assert(_c_map[name][key].second != nullptr);
+    if(ret_ptr != nullptr || ret_ptr == UNINITIALIZED_PTR_VALUE){
+        //std::cout << "deleted" <<std::endl;
+        delete ret_ptr;
+        ret_ptr = nullptr;
+    }
+
+
+    QuickConfigDataType _type = _c_map[name][key].first;
+    if(_type != QuickConfigDataType::QC_DT_BOOLEAN){
+        raise_checking_error("Type conversion failed. Should be "+type_2_str_map[_type]);
+    }
+    bool _b_val = *static_cast<bool*>(this->_c_map[name][key].second);
+    //std::cout << _b_val << std::endl;
+    ret_ptr = new bool{_b_val};
+}
+
+}
+
+
 
 
