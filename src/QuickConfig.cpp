@@ -83,7 +83,7 @@ void QuickConfigServer::check_configfile_fomat(std::fstream* _file){
     while (std::getline(*_file, line)) {
         checking_line = line_id;
         checking_line_str = line;
-        std::cout << line << std::endl;
+        //std::cout << line << std::endl;
         if(line_id == 1){
             check_configfile_header(line,&checking_is_header_exists);
         }else{
@@ -98,16 +98,16 @@ void QuickConfigServer::check_configfile_fomat(std::fstream* _file){
         line_id++;
     }
 
-    std::cout << "is_header_exists : " << checking_is_header_exists << std::endl;
-    std::cout << "is_config_row_qualified : " << checking_is_config_row_qualified << std::endl;
-    std::cout << "is_no_duplicated : " << checking_is_no_duplicated << std::endl;
+    //std::cout << "is_header_exists : " << checking_is_header_exists << std::endl;
+    //std::cout << "is_config_row_qualified : " << checking_is_config_row_qualified << std::endl;
+    //std::cout << "is_no_duplicated : " << checking_is_no_duplicated << std::endl;
 }
 
 
 
 void QuickConfigServer::check_configfile_header(str _line, bool* value){
     if (_line.starts_with("[QuickConfig::") && _line.ends_with("]")){
-        std::cout << _line << " is valid" << std::endl;
+        //std::cout << _line << " is valid" << std::endl;
         str front = "[QuickConfig::";
         size_t front_c = front.size();
         size_t end_pos = _line.size()-1;
@@ -170,7 +170,7 @@ void QuickConfigServer::check_configfile_body(str _line, bool* value){
         if (value_split_pos != std::string::npos && value_split_pos > type_split_pos) {
             str _value_string = _line.substr(value_split_pos+2,_line.size() - value_split_pos+2);
             checking_value_str = _value_string;
-            std::cout << _value_string << " is value string" << std::endl;
+            //std::cout << _value_string << " is value string" << std::endl;
             bool is_value_str_valid = false;
             switch (_line[0]){
             case 'n':
@@ -194,7 +194,7 @@ void QuickConfigServer::check_configfile_body(str _line, bool* value){
                 str key_name = _line.substr(_line.rfind('@')+1, _line.rfind("::")-2);
                 checking_value_type = _line[0];
                 checking_config_key = key_name;
-                std::cout << _line << " is valid" << std::endl;
+                //std::cout << _line << " is valid" << std::endl;
                 *value = true;
             }
         }
@@ -206,8 +206,8 @@ void QuickConfigServer::check_configfile_body(str _line, bool* value){
 }
 void QuickConfigServer::check_configfile_duplicated(str _line,bool* value){
     // body
-    std::cout << checking_config_name+"@@"+checking_config_key << " is name and key" << std::endl;
-    std::cout << exists_key.contains(checking_config_name+"@@"+checking_config_key) << " is exists key " << std::endl;
+    //std::cout << checking_config_name+"@@"+checking_config_key << " is name and key" << std::endl;
+    //std::cout << exists_key.contains(checking_config_name+"@@"+checking_config_key) << " is exists key " << std::endl;
     if(exists_key.contains(checking_config_name+"@@"+checking_config_key)){
         raise_checking_error("Target config key was duplicated.");
     }else{
@@ -247,6 +247,7 @@ void QuickConfigServer::add_config_path(QC_Path _path){
         }
     }
 
+    /*
     for(auto& it : _c_map){
         str _ns = it.first;
         config_set _cs = it.second;
@@ -287,7 +288,7 @@ void QuickConfigServer::add_config_path(QC_Path _path){
             }
         }
     }
-
+    */
     checking_line = 0;
     checking_file = "";
     checking_config_name = "";
