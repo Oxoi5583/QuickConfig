@@ -1,9 +1,9 @@
-### QuickConfig - a ez-to-use config library
+# QuickConfig - a ez-to-use config library
 
-# Introduction
+## Introduction
 This is a simple ez-to-use config library. I built it just for practicing and personal development.
 
-# Usage
+## Usage
 1. Create a config folder
 
 2. Create .qc file in ./config (.qc stand for Quick Config). By the following format.
