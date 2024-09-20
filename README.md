@@ -25,8 +25,8 @@ Here is a valid example for .qc</br>
     s@str_name::test</br>
     b@bool_name::true</br>
 </br>
-![image](https://github.com/user-attachments/assets/b99e6ca3-0033-4ce7-b049-f4d1429f6282)
-![image](https://github.com/user-attachments/assets/34fe14a4-7440-408f-ad97-82da9033ca82)
+![image](https://github.com/user-attachments/assets/b99e6ca3-0033-4ce7-b049-f4d1429f6282)</br>
+![image](https://github.com/user-attachments/assets/34fe14a4-7440-408f-ad97-82da9033ca82)</br>
 
 Remark : .qc Config_Namespace can be duplicated
          but config_key should be unique in one namespace.
