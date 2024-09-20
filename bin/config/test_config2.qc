@@ -5,6 +5,3 @@ b@bool_name2::true
 n@numberadb::1
 s@str_name3::test
 b@bool_name3::true
-
-
-

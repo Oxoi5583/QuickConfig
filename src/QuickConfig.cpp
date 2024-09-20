@@ -82,13 +82,19 @@ void QuickConfigServer::check_configfile_fomat(std::fstream* _file){
     int line_id = 1;
     while (std::getline(*_file, line)) {
         checking_line = line_id;
-        checking_line_str = line;
-        //std::cout << line << std::endl;
+        checking_line_str = line.substr(0,line.rfind("//"));
+        trim(checking_line_str);
+
+        if(checking_line_str == ""){
+            continue;
+        }
+
+        //std::cout << checking_line_str << std::endl;
         if(line_id == 1){
-            check_configfile_header(line,&checking_is_header_exists);
+            check_configfile_header(checking_line_str,&checking_is_header_exists);
         }else{
-            check_configfile_body(line, &checking_is_config_row_qualified);
-            check_configfile_duplicated(line, &checking_is_no_duplicated);
+            check_configfile_body(checking_line_str, &checking_is_config_row_qualified);
+            check_configfile_duplicated(checking_line_str, &checking_is_no_duplicated);
             if(checking_is_header_exists 
                 && checking_is_config_row_qualified 
                 && checking_is_no_duplicated){
@@ -170,6 +176,7 @@ void QuickConfigServer::check_configfile_body(str _line, bool* value){
         if (value_split_pos != std::string::npos && value_split_pos > type_split_pos) {
             str _value_string = _line.substr(value_split_pos+2,_line.size() - value_split_pos+2);
             checking_value_str = _value_string;
+            trim(checking_value_str);
             //std::cout << _value_string << " is value string" << std::endl;
             bool is_value_str_valid = false;
             switch (_line[0]){
@@ -194,6 +201,7 @@ void QuickConfigServer::check_configfile_body(str _line, bool* value){
                 str key_name = _line.substr(_line.rfind('@')+1, _line.rfind("::")-2);
                 checking_value_type = _line[0];
                 checking_config_key = key_name;
+                trim(checking_config_key);
                 //std::cout << _line << " is valid" << std::endl;
                 *value = true;
             }
@@ -222,7 +230,7 @@ void QuickConfigServer::raise_checking_error(str msg){
     << "[ERROR] Exception : " 
     << msg
     << std::endl;
-    if(checking_file == ""){
+    if(checking_file != ""){
         std::cerr 
         << "    (" 
         << checking_file
