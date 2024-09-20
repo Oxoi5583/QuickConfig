@@ -353,15 +353,10 @@ void QuickConfigServer::add_config(){
 
 #define UNINITIALIZED_PTR_VALUE reinterpret_cast<void*>(0xDEADBEEF)
 
-void QuickConfigServer::get(const str& name, const str& key, double* ret_ptr){
+void QuickConfigServer::get(const str& name, const str& key, double& ret_ptr){
     assert(_c_map.contains(name));
     assert(_c_map[name].contains(key));
     assert(_c_map[name][key].second != nullptr);
-    if(ret_ptr != nullptr || ret_ptr == UNINITIALIZED_PTR_VALUE){
-        //std::cout << "deleted" <<std::endl;
-        delete ret_ptr;
-        ret_ptr = nullptr;
-    }
 
 
     QuickConfigDataType _type = _c_map[name][key].first;
@@ -370,18 +365,13 @@ void QuickConfigServer::get(const str& name, const str& key, double* ret_ptr){
     }
     double _n_val = *static_cast<double*>(this->_c_map[name][key].second);
     //std::cout << _n_val << std::endl;
-    ret_ptr = new double{_n_val};
+    ret_ptr = _n_val;
 }
-void QuickConfigServer::get(const str& name, const str& key, str*& ret_ptr){
+void QuickConfigServer::get(const str& name, const str& key, str& ret_ptr){
     assert(_c_map.contains(name));
     assert(_c_map[name].contains(key));
     assert(_c_map[name][key].second != nullptr);
-    if(ret_ptr != nullptr || ret_ptr == UNINITIALIZED_PTR_VALUE){
-        //std::cout << "deleted" <<std::endl;
-        delete ret_ptr;
-        ret_ptr = nullptr;
-    }
-    
+
 
     QuickConfigDataType _type = _c_map[name][key].first;
     if(_type != QuickConfigDataType::QC_DT_STRING){
@@ -390,17 +380,12 @@ void QuickConfigServer::get(const str& name, const str& key, str*& ret_ptr){
     str _s_val = *static_cast<str*>(this->_c_map[name][key].second);
     //std::cout << _s_val << std::endl;
     //std::cout << ret_ptr << std::endl;
-    ret_ptr = new str{_s_val};
+    ret_ptr = _s_val;
 }
-void QuickConfigServer::get(const str& name, const str& key, bool* ret_ptr){
+void QuickConfigServer::get(const str& name, const str& key, bool& ret_ptr){
     assert(_c_map.contains(name));
     assert(_c_map[name].contains(key));
     assert(_c_map[name][key].second != nullptr);
-    if(ret_ptr != nullptr || ret_ptr == UNINITIALIZED_PTR_VALUE){
-        //std::cout << "deleted" <<std::endl;
-        delete ret_ptr;
-        ret_ptr = nullptr;
-    }
 
 
     QuickConfigDataType _type = _c_map[name][key].first;
@@ -409,7 +394,7 @@ void QuickConfigServer::get(const str& name, const str& key, bool* ret_ptr){
     }
     bool _b_val = *static_cast<bool*>(this->_c_map[name][key].second);
     //std::cout << _b_val << std::endl;
-    ret_ptr = new bool{_b_val};
+    ret_ptr = _b_val;
 }
 
 }

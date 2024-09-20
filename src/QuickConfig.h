@@ -90,9 +90,9 @@ public:
     void add_config_path(QC_Path _path);
 
 
-    void get(const str& name, const str& key, double* ret_ptr);
-    void get(const str& name, const str& key, str*& ret_ptr);
-    void get(const str& name, const str& key, bool* ret_ptr);
+    void get(const str& name, const str& key, double& ret_ptr);
+    void get(const str& name, const str& key, str& ret_ptr);
+    void get(const str& name, const str& key, bool& ret_ptr);
 
     ~QuickConfigServer();
 };
