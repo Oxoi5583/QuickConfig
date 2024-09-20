@@ -8,23 +8,23 @@ This is a simple ez-to-use config library. I built it just for practicing and pe
 
 2. Create .qc file in ./config (.qc stand for Quick Config). By the following format.
 
-    [QuickConfig::<Config_Namespace>]
-    <data_type1>@<config_key1>::<value1>
-    <data_type2>@<config_key2>::<value2>
-    <data_type3>@<config_key3>::<value3>
-
-    i. Config_Namespace is the namespace for your config
-    ii. data_type should be 'n' (Numberic), 's' (String), 'b' (Boolean)
-    iii. config_key is the key for searching value
-    iv. value should align to the data_type
-
-Here is a valid example for .qc
-
-    [QuickConfig::Test_Config]
-    n@num_name::3.1415
-    s@str_name::test
-    b@bool_name::true
-
+    [QuickConfig::<Config_Namespace>]</br>
+    <data_type1>@<config_key1>::<value1></br>
+    <data_type2>@<config_key2>::<value2></br>
+    <data_type3>@<config_key3>::<value3></br>
+</br>
+    i. Config_Namespace is the namespace for your config</br>
+    ii. data_type should be 'n' (Numberic), 's' (String), 'b' (Boolean)</br>
+    iii. config_key is the key for searching value</br>
+    iv. value should align to the data_type</br>
+</br>
+Here is a valid example for .qc</br>
+</br>
+    [QuickConfig::Test_Config]</br>
+    n@num_name::3.1415</br>
+    s@str_name::test</br>
+    b@bool_name::true</br>
+</br>
 ![image](https://github.com/user-attachments/assets/b99e6ca3-0033-4ce7-b049-f4d1429f6282)
 ![image](https://github.com/user-attachments/assets/34fe14a4-7440-408f-ad97-82da9033ca82)
 
