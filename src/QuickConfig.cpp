@@ -10,7 +10,7 @@ void QC_Path::check_path_exist(){
         << _std_path.string()
         << ")"
         << std::endl;
-        exit(1);
+        exit(1); 
     }
 }
 

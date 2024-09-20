@@ -19,7 +19,7 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_DEBUG ${LIB_PATH})
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_DEBUG ${LIB_PATH})
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG ${EXE_PATH})
 
-include_directories(src)
+include_directories(include)
 
 file(GLOB LIB_SRC_FILES "src/*.c*")
 add_library(${PROJECT_NAME} ${LIB_SRC_FILES})
