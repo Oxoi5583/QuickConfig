@@ -32,6 +32,8 @@ int main(){
         std::cout << "_demo_bool value : " << "false" << std::endl;
     }
 
+    // Set value by set() method. 
+    // Arguments should be (<Config_NameSpace>, <Config_Key>, <New_Value>)
     QC_Server->set("Test_Config","str_name", "Hello World");
     QC_Server->set("Test_Config","num_name", 0.542);
     QC_Server->set("Test_Config","num_name", 1000);
