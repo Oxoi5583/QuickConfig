@@ -32,6 +32,13 @@ int main(){
         std::cout << "_demo_bool value : " << "false" << std::endl;
     }
 
+    QC_Server->set("Test_Config","str_name", "Hello World");
+    QC_Server->set("Test_Config","num_name", 0.542);
+    QC_Server->set("Test_Config","num_name", 1000);
+    QC_Server->set("Test_Config","bool_name", false);
+    QC_Server->set("Test_Config", "num_after_linefeed", 456);
+
+    QC_Server->save();
     return 0;
 }
 

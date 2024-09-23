@@ -1,12 +1,14 @@
 #ifndef QUICK_CONFIG_H
 #define QUICK_CONFIG_H
 
+#include <algorithm>
 #include <iostream>
 #include <string>
 #include <sstream>
 #include <filesystem>
 #include <fstream>
 #include <map>
+#include <vector>
 #include <unordered_set>
 #include <assert.h>
 
@@ -63,7 +65,8 @@ typedef std::pair<data_type, value_ptr> config_value;
 typedef std::map<config_name, config_value> config_set;
 typedef str config_set_name;
 typedef std::map<config_set_name, config_set> config_map;
-
+typedef str file_path;
+typedef str file_content;
 
 class QuickConfigServer{
 private:
@@ -77,6 +80,7 @@ private:
     bool checking_is_header_exists = false;
     bool checking_is_config_row_qualified = false;
     bool checking_is_no_duplicated = false;
+    std::vector<std::pair<file_path,file_content>> file_content_cache = {};
     std::unordered_set<str> exists_name = {};
     std::unordered_set<str> exists_key = {};
 
@@ -112,6 +116,17 @@ public:
     void get(const str& name, const str& key, double& ret_ptr);
     void get(const str& name, const str& key, str& ret_ptr);
     void get(const str& name, const str& key, bool& ret_ptr);
+
+    void set(const str& name, const str& key, double ret_ptr);
+    void set(const str& name, const str& key, float ret_ptr);
+    void set(const str& name, const str& key, int ret_ptr);
+    void set(const str& name, const str& key, str ret_ptr);
+    void set(const str& name, const str& key, const char* ret_ptr);
+    void set(const str& name, const str& key, bool ret_ptr);
+
+    str get_str(const str& name, const str& key);
+
+    void save();
 
     ~QuickConfigServer();
 };

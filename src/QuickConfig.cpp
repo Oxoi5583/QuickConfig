@@ -112,13 +112,16 @@ void QuickConfigServer::check_configfile_fomat(std::fstream* _file){
 
 
 void QuickConfigServer::check_configfile_header(str _line, bool* value){
-    if (_line.starts_with("[QuickConfig::") && _line.ends_with("]")){
-        //std::cout << _line << " is valid" << std::endl;
+    str _l_for_checking = _line;
+    trim(_l_for_checking);
+    if (_l_for_checking.starts_with("[QuickConfig::") && (_l_for_checking.ends_with("]") || _l_for_checking.ends_with("]\n"))){
+        //std::cout << _line << " Header is valid" << std::endl;
         str front = "[QuickConfig::";
         size_t front_c = front.size();
-        size_t end_pos = _line.size()-1;
+        size_t end_pos = _l_for_checking.size()-1;
         str config_name = _line.substr(front_c, end_pos-front_c);
         checking_config_name = config_name;
+        
         *value = true;
     }
 }
@@ -224,6 +227,53 @@ void QuickConfigServer::check_configfile_duplicated(str _line,bool* value){
     }
 }
 
+
+
+void QuickConfigServer::save(){
+    std::cout << "There are " << file_content_cache.size() << " file(s) to save." << std::endl;
+    for(int i = 0; i < this->file_content_cache.size(); i++){
+        auto it = this->file_content_cache[i];
+        str path = it.first;
+        //std::cout << path << std::endl;
+        std::stringstream content_ss(it.second);
+        std::stringstream new_content_ss;
+        str _line;
+
+        int line_id = 1;
+        while (std::getline(content_ss, _line)){
+            checking_line = line_id;
+            checking_line_str = _line.substr(0,_line.rfind("//"));
+            trim(checking_line_str);
+
+            if(checking_line_str == ""){
+                new_content_ss << _line << "\n";
+                continue;
+            }
+
+            //std::cout << _line << std::endl;
+            if(line_id == 1){
+                bool dummy = true;
+                check_configfile_header(checking_line_str, &dummy);
+            }else{
+                bool dummy = true;
+                check_configfile_body(checking_line_str, &dummy);
+                check_configfile_duplicated(checking_line_str, &dummy);
+                int split_pos = _line.find("::")+2;
+                //std::cout << checking_config_name << " : " << checking_config_key << std::endl;
+                _line.replace(split_pos,_line.size()-split_pos,get_str(checking_config_name,checking_config_key));
+            }
+            new_content_ss << _line << "\n";
+            //std::cout << "new line : " << _line << std::endl;
+            line_id++;
+        }
+
+        std::ofstream target_file;
+        target_file.open(path);
+        target_file << new_content_ss.str();
+        target_file.close();
+    }
+}
+
 void QuickConfigServer::raise_checking_error(str msg){
     //#ifndef DEBUG
     std::cerr 
@@ -258,6 +308,18 @@ void QuickConfigServer::add_config_path(QC_Path _path){
             std::fstream _file = std::fstream(it.path().string());
             checking_file = it.path().string();
             check_configfile_fomat(&_file);
+
+            _file.close();
+            std::ifstream _file2 = std::ifstream(it.path().string());
+
+            std::string full_path = checking_file;
+            std::ostringstream ss;
+            _file2.seekg(0, std::ios::beg);
+            ss << _file2.rdbuf();
+            std::string content = ss.str();
+            
+            std::pair _p = std::make_pair(full_path, content);
+            file_content_cache.push_back(_p);
         }
     }
 
@@ -365,6 +427,8 @@ void QuickConfigServer::get(const str& name, const str& key, double& ret_ptr){
     assert(_c_map.contains(name));
     assert(_c_map[name].contains(key));
     assert(_c_map[name][key].second != nullptr);
+    assert(name != "");
+    assert(key != "");
 
 
     QuickConfigDataType _type = _c_map[name][key].first;
@@ -379,7 +443,8 @@ void QuickConfigServer::get(const str& name, const str& key, str& ret_ptr){
     assert(_c_map.contains(name));
     assert(_c_map[name].contains(key));
     assert(_c_map[name][key].second != nullptr);
-
+    assert(name != "");
+    assert(key != "");
 
     QuickConfigDataType _type = _c_map[name][key].first;
     if(_type != QuickConfigDataType::QC_DT_STRING){
@@ -394,7 +459,8 @@ void QuickConfigServer::get(const str& name, const str& key, bool& ret_ptr){
     assert(_c_map.contains(name));
     assert(_c_map[name].contains(key));
     assert(_c_map[name][key].second != nullptr);
-
+    assert(name != "");
+    assert(key != "");
 
     QuickConfigDataType _type = _c_map[name][key].first;
     if(_type != QuickConfigDataType::QC_DT_BOOLEAN){
@@ -403,6 +469,124 @@ void QuickConfigServer::get(const str& name, const str& key, bool& ret_ptr){
     bool _b_val = *static_cast<bool*>(this->_c_map[name][key].second);
     //std::cout << _b_val << std::endl;
     ret_ptr = _b_val;
+}
+
+
+void QuickConfigServer::set(const str& name, const str& key, double ret_ptr){
+    assert(_c_map.contains(name));
+    assert(_c_map[name].contains(key));
+    assert(_c_map[name][key].second != nullptr);
+    assert(name != "");
+    assert(key != "");
+
+
+    QuickConfigDataType _type = _c_map[name][key].first;
+    if(_type != QuickConfigDataType::QC_DT_NUMBER){
+        raise_checking_error("Type conversion failed. Should be "+type_2_str_map[_type]);
+    }
+    delete this->_c_map[name][key].second;
+    this->_c_map[name][key].second = new double{ret_ptr};
+}
+void QuickConfigServer::set(const str& name, const str& key, float ret_ptr){
+    assert(_c_map.contains(name));
+    assert(_c_map[name].contains(key));
+    assert(_c_map[name][key].second != nullptr);
+    assert(name != "");
+    assert(key != "");
+
+
+    QuickConfigDataType _type = _c_map[name][key].first;
+    if(_type != QuickConfigDataType::QC_DT_NUMBER){
+        raise_checking_error("Type conversion failed. Should be "+type_2_str_map[_type]);
+    }
+    delete this->_c_map[name][key].second;
+    this->_c_map[name][key].second = new double{ret_ptr};
+}
+void QuickConfigServer::set(const str& name, const str& key, int ret_ptr){
+    assert(_c_map.contains(name));
+    assert(_c_map[name].contains(key));
+    assert(_c_map[name][key].second != nullptr);
+    assert(name != "");
+    assert(key != "");
+
+
+    QuickConfigDataType _type = _c_map[name][key].first;
+    if(_type != QuickConfigDataType::QC_DT_NUMBER){
+        raise_checking_error("Type conversion failed. Should be "+type_2_str_map[_type]);
+    }
+    delete this->_c_map[name][key].second;
+    this->_c_map[name][key].second = new double{(double)ret_ptr};
+}
+void QuickConfigServer::set(const str& name, const str& key, const char* ret_ptr){
+    assert(_c_map.contains(name));
+    assert(_c_map[name].contains(key));
+    assert(_c_map[name][key].second != nullptr);
+    assert(name != "");
+    assert(key != "");
+
+    QuickConfigDataType _type = _c_map[name][key].first;
+    if(_type != QuickConfigDataType::QC_DT_STRING){
+        raise_checking_error("Type conversion failed. Should be "+type_2_str_map[_type]);
+    }
+    delete this->_c_map[name][key].second;
+    this->_c_map[name][key].second = new str{ret_ptr};
+}
+void QuickConfigServer::set(const str& name, const str& key, str ret_ptr){
+    assert(_c_map.contains(name));
+    assert(_c_map[name].contains(key));
+    assert(_c_map[name][key].second != nullptr);
+    assert(name != "");
+    assert(key != "");
+
+    QuickConfigDataType _type = _c_map[name][key].first;
+    if(_type != QuickConfigDataType::QC_DT_STRING){
+        raise_checking_error("Type conversion failed. Should be "+type_2_str_map[_type]);
+    }
+    delete this->_c_map[name][key].second;
+    this->_c_map[name][key].second = new str{ret_ptr};
+}
+void QuickConfigServer::set(const str& name, const str& key, bool ret_ptr){
+    assert(_c_map.contains(name));
+    assert(_c_map[name].contains(key));
+    assert(_c_map[name][key].second != nullptr);
+    assert(name != "");
+    assert(key != "");
+
+    QuickConfigDataType _type = _c_map[name][key].first;
+    if(_type != QuickConfigDataType::QC_DT_BOOLEAN){
+        raise_checking_error("Type conversion failed. Should be "+type_2_str_map[_type]);
+    }
+    delete this->_c_map[name][key].second;
+    this->_c_map[name][key].second = new bool{ret_ptr};
+}
+
+str QuickConfigServer::get_str(const str& name, const str& key){
+    QuickConfigDataType _type = _c_map[name][key].first;
+    str ret = "";
+    double ret_d;
+    bool ret_b;
+    str ret_s;
+    switch (_type){
+    case QuickConfigDataType::QC_DT_NUMBER :
+        this->get(name, key, ret_d);
+        ret = std::to_string(ret_d);
+        break;
+    case QuickConfigDataType::QC_DT_BOOLEAN:
+        this->get(name, key, ret_b);
+        if(ret_b){
+            ret = "true";
+        }else{
+            ret = "false";
+        }
+        break;
+    case QuickConfigDataType::QC_DT_STRING:
+        this->get(name, key, ret_s);
+        ret = ret_s;
+        break;
+    default:
+        break;
+    }
+    return ret;
 }
 
 }
