@@ -41,6 +41,11 @@ int main(){
     QC_Server->set("Test_Config", "num_after_linefeed", 456);
 
     QC_Server->save();
+
+
+    QC_Server->init();
+    QC_Server->add_config_path(_path);
+
     return 0;
 }
 

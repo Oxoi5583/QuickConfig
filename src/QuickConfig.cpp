@@ -589,6 +589,25 @@ str QuickConfigServer::get_str(const str& name, const str& key){
     return ret;
 }
 
+void QuickConfigServer::init(){
+    checking_line = 0;
+    checking_file = "";
+    checking_config_name = "";
+    checking_config_key = "";
+    checking_line_str = "";
+    checking_value_str = "";
+    checking_value_type = ' ';
+    checking_is_header_exists = false;
+    checking_is_config_row_qualified = false;
+    checking_is_no_duplicated = false;
+
+    file_content_cache.clear();
+    exists_name.clear();
+    exists_key.clear();
+
+}
+
+
 }
 
 

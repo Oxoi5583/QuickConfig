@@ -112,6 +112,7 @@ public:
     static QuickConfigServer* get_instance();
     void add_config_path(QC_Path _path);
 
+    void init();
 
     void get(const str& name, const str& key, double& ret_ptr);
     void get(const str& name, const str& key, str& ret_ptr);
