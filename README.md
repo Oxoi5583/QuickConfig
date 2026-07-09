@@ -1,51 +1,211 @@
-# QuickConfig - a ez-to-use config library
+# QuickConfig
 
-## Introduction
-This is a simple ez-to-use config library. I built it just for practicing and personal development.
+QuickConfig is a small C++20 configuration library for loading, reading, updating, and saving simple `.qc` config files.
 
-## Usage
-1. Create a config folder
+It was built as a practice and personal-development project, with a compact API around namespaced config values.
 
-2. Create .qc file in ./config (.qc stand for Quick Config). By the following format.
+## Features
 
-    [QuickConfig::<Config_Namespace>]</br>
-    <data_type1>@<config_key1>::<value1></br>
-    <data_type2>@<config_key2>::<value2></br>
-    <data_type3>@<config_key3>::<value3></br>
-</br>
-    i. Config_Namespace is the namespace for your config</br>
-    ii. data_type should be 'n' (Numberic), 's' (String), 'b' (Boolean)</br>
-    iii. config_key is the key for searching value</br>
-    iv. value should align to the data_type</br>
-</br>
-Here is a valid example for .qc</br>
-</br>
-    [QuickConfig::Test_Config]</br>
-    n@num_name::3.1415</br>
-    s@str_name::test</br>
-    b@bool_name::true</br>
-</br>
+- Loads every `.qc` file from a config directory.
+- Supports namespaced config sets.
+- Supports number, string, and boolean values.
+- Provides typed `get()` and `set()` overloads.
+- Saves changed values back to the original config files.
+- Allows `//` comments in config files.
 
-![image](https://github.com/user-attachments/assets/b99e6ca3-0033-4ce7-b049-f4d1429f6282)</br>
-![image](https://github.com/user-attachments/assets/34fe14a4-7440-408f-ad97-82da9033ca82)</br>
+## Project Layout
 
-Remark : .qc Config_Namespace can be duplicated
-         but config_key should be unique in one namespace.
-         And you can use // to comment in the .qc file
+```text
+.
+├── include/
+│   └── QuickConfig.h
+├── src/
+│   └── QuickConfig.cpp
+├── test/
+│   └── test.cpp
+├── bin/
+│   └── config/
+│       ├── test_config.qc
+│       └── test_config2.qc
+├── CMakeLists.txt
+├── compile.bat
+└── run.bat
+```
 
-    
-4. include the header file "QuickConfig.h" & link the lib file
+## Requirements
 
-![image](https://github.com/user-attachments/assets/455fb5da-ee0b-4297-a6e7-926fe38abbcf)
+- CMake 3.30 or newer
+- A C++20 compiler
+- `ccache`, because the current `CMakeLists.txt` configures it as the compiler launcher
 
-5. In your own source, Create a QC_Path Object. And Move to ./config
+## Build and Run
 
-![image](https://github.com/user-attachments/assets/6e74e724-3d2c-4963-a328-48ebb0fa317b)
+On Windows, use the included batch script:
 
-6. Register the QC_Path on QC_Server
+```bat
+compile.bat
+```
 
-![image](https://github.com/user-attachments/assets/86675599-64be-4d9e-8d5e-6bc4cd8172df)
+The script configures the project, builds it, and runs the test executable from `bin/test.exe`.
 
-7. Get value from QC_Server
+You can also run the steps manually:
 
-![image](https://github.com/user-attachments/assets/ba7ffd5e-6dca-4952-80c2-16569c9016bc)
+```bat
+cmake -S . -B build --fresh
+cmake --build build
+bin\test.exe
+```
+
+Build output is written to:
+
+- `bin/` for the test executable
+- `lib/` for the QuickConfig library
+
+## Config File Format
+
+QuickConfig reads files with the `.qc` extension. Each file starts with a namespace header:
+
+```qc
+[QuickConfig::<namespace>]
+```
+
+Config values use this format:
+
+```qc
+<type>@<key>::<value>
+```
+
+Supported types:
+
+| Type | Meaning | C++ value type |
+| --- | --- | --- |
+| `n` | Number | `double` |
+| `s` | String | `std::string` |
+| `b` | Boolean | `bool` |
+
+Example:
+
+```qc
+[QuickConfig::App]
+n@window_width::1280
+n@window_height::720
+s@title::QuickConfig Demo
+b@fullscreen::false
+```
+
+Comments are supported with `//`:
+
+```qc
+// This line is ignored
+n@volume::0.8
+```
+
+Notes:
+
+- A `.qc` file has one namespace header.
+- The same namespace can appear in multiple `.qc` files.
+- Keys must be unique inside the same namespace.
+- Boolean values accept `true`, `false`, `t`, `f`, `yes`, `no`, `y`, and `n`.
+
+## Basic Usage
+
+Create a config directory, then place one or more `.qc` files inside it.
+
+For example, if the executable runs from `bin/`, this project uses:
+
+```text
+bin/
+└── config/
+    └── test_config.qc
+```
+
+Include the header:
+
+```cpp
+#include <QuickConfig.h>
+```
+
+Load a config path:
+
+```cpp
+QuickConfig::QC_Path path;
+path.go_to_child("config");
+
+QC_Server->add_config_path(path);
+```
+
+Read values:
+
+```cpp
+std::string title;
+double width;
+bool fullscreen;
+
+QC_Server->get("App", "title", title);
+QC_Server->get("App", "window_width", width);
+QC_Server->get("App", "fullscreen", fullscreen);
+```
+
+Update and save values:
+
+```cpp
+QC_Server->set("App", "title", "Updated Title");
+QC_Server->set("App", "window_width", 1920);
+QC_Server->set("App", "fullscreen", true);
+
+QC_Server->save();
+```
+
+Reload configs:
+
+```cpp
+QC_Server->init();
+QC_Server->add_config_path(path);
+```
+
+## API Overview
+
+| API | Description |
+| --- | --- |
+| `QuickConfig::QC_Path()` | Creates a path at the current working directory. |
+| `QuickConfig::QC_Path(path)` | Creates a path from the current working directory plus `path`. |
+| `QC_Path::go_to_child(path)` | Moves the path into a child directory. |
+| `QC_Path::go_to_parent()` | Moves the path to its parent directory. |
+| `QC_Path::to_string()` | Returns the path as a string. |
+| `QC_Server->add_config_path(path)` | Loads all `.qc` files in the given directory. |
+| `QC_Server->get(namespace, key, value)` | Reads a value into a typed output variable. |
+| `QC_Server->set(namespace, key, value)` | Updates a loaded value. |
+| `QC_Server->get_str(namespace, key)` | Returns a config value as a string. |
+| `QC_Server->save()` | Writes changed values back to the loaded config files. |
+| `QC_Server->init()` | Clears loaded config state and file cache. |
+
+`QC_Server` is a macro for:
+
+```cpp
+QuickConfig::QuickConfigServer::get_instance()
+```
+
+## Using QuickConfig in Another Project
+
+Add `include/` to your include path and link against the built `QuickConfig` library.
+
+With CMake, the local project already builds:
+
+```cmake
+add_library(QuickConfig src/QuickConfig.cpp)
+target_include_directories(QuickConfig PUBLIC include)
+```
+
+Then link your executable to `QuickConfig`.
+
+## Current Limitations
+
+- Config loading scans only the given directory, not nested directories.
+- `set()` can update existing keys only; it does not create new config entries.
+- Type mismatches and invalid config formats terminate the program with an error.
+- String values are trimmed, so leading and trailing spaces are not preserved.
+- Because `//` starts a comment, string values should not contain raw `//`.
+
+## Example
+
+See [`test/test.cpp`](test/test.cpp) and the sample configs in [`bin/config/`](bin/config/).
